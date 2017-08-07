@@ -1,6 +1,5 @@
 <?php
 
-
 class Fighter
 {
 	public function setHealth($value)
