@@ -38,9 +38,6 @@ class Fighter
 	}
 }
 
-
-
-
 //client code
 
 $fighter = new Fighter;
@@ -52,4 +49,11 @@ if ($health <= 50) {
 }else if($health >= 50) {
 	var_dump($fighter->setAggressive());
 }
+
+/**
+ Problem in this block of code
+ 1. It breaks OCP(Open Close Principle) rule. (OCP: A class is open for extend not for modification)
+ 2. We can't add new mode instaed of changing the main class
+ 3. It also breaks the Principle of Lest Knowledge
+ */
 
