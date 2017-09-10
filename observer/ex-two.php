@@ -1,100 +1,79 @@
 <?php
 
-interface Observer {
-    public function addCurrency(Currency $currency);
+interface Subject {
+    public function addCurrency(Observer $observer);
+    public function removeCurrency(Observer $observer);
+    public function notify();
 }
 
+interface Observer {
+    public function update();
+}
 
-class Simulator implements Observer {
+class Currency implements Subject {
+    private $currencies = [];
 
-    private $currencies;
-
-    public function __construct()
+    public function addCurrency(Observer $observer) 
     {
-        $this->currencies = array();
+        $this->currencies[] = $observer;
+
+        return $this;
     }
 
-    public function addCurrency(Currency $currency)
+    public function removeCurrency(Observer $observer) 
     {
-        array_push($this->currencies, $currency);
+        if($key = array_search($observer, $this->currencies)) {
+            unset($this->currencies[$key]);
+        }
+
     }
 
-    public function updatePrice()
+    public function notify()
     {
         foreach ($this->currencies as $currency) {
             $currency->update();
         }
     }
-}
 
-interface Currency {
-    public function update();
-    public function getPrice();
-}
-
-class Pound implements Currency {
-    private $price;
-
-    public function __construct($price)
+    public function fire()
     {
-        $this->price = $price;
-        echo "<p>Pound original price: {$price}</p>";
+        $this->notify();
     }
+}
+
+class Pound implements Observer {
+
+    public function __construct() 
+    {
+        var_dump('Pound original price');
+    }
+
 
     public function update()
     {
-        $this->price = $this->getPrice();
-        echo "<p>Pound updated price: {$this->price}</p>";
+        var_dump('pound is updated');
     }
 
-    public function getPrice() {
-        return f_rand(0.65, 0.71);
-    }
 }
 
+class Yen implements Observer {
 
-class Yen implements Currency {
-    private $price;
-
-    public function __construct($price)
+    public function __construct() 
     {
-        $this->price = $price;
-        echo "<p>Yen original price: {$price}</p>";
+        var_dump('Yen original price');
     }
+
 
     public function update()
     {
-        $this->price = $this->getPrice();
-        echo "<p>Yen updated price: {$this->price}</p>";
+        var_dump('Yen is updated');
     }
 
-    public function getPrice()
-    {
-        return f_rand(120.52, 122.50);
-    }
 }
 
-function f_rand($min=0,$max=1,$mul=1000000){
-    if ($min>$max) return false;
-    return mt_rand($min*$mul,$max*$mul)/$mul;
-}
+$currency = new Currency;
+
+$currency->addCurrency(new Pound)->addCurrency(new Yen);
 
 
-$simulator = new Simulator();
-
-$pound = new Pound(1.2);
-$yen = new Yen(10.5);
-
-
-$simulator->addCurrency($pound);
-$simulator->addCurrency($yen);
-
-$simulator->updatePrice();
-
-
-
-
-
-
-
-
+$currency->fire();
